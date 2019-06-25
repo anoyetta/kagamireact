@@ -1,20 +1,24 @@
 import React from 'react';
 import './App.css';
-// import { library, layer } from '@fortawesome/fontawesome-svg-core'
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faRedo, faCog, faCaretRight} from '@fortawesome/free-solid-svg-icons'
-// import { breakStatement } from '@babel/types';
-// library.add(faRedo, faCog, faCaretRight);
 function importAll(r) {
   let images = {};
-  r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
+  r.keys().map((item) => { images[item.replace('./', '')] = r(item); });
   return images;
 }
 const images = importAll(require.context('./action_icons', false, /\.png$/));
-
+const RELEASE_NOTE= [
+  <li>version alpha
+    <ul>
+      <li>- まれにアクションが取れない?</li>
+      <li>- CPU,memory使用量が多すぎ</li>
+      <li>- config機能未実装</li>
+      <li>- 見た目が悪すぎる</li>
+    </ul>
+  </li>
+];
 const TEST_MODEL = {
   "player": "",
-  "job": "",
+  "job": "BLU",
   "encDPS": 0.0,
   "duration": "00:00:00",
   "zone": "kagami",
@@ -23,85 +27,144 @@ const TEST_MODEL = {
   "actions": []
 }
 
-class KagamiAction extends React.Component{
-  // constructor(props){
-  //   super(props);
-  //   this.state={
-  //     timestamp: this.props.model.timestamp
-  //   }
-  // }
+class KagamiContainer extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      active: false,
+      actions: this.props.actions
+    }
+  }
+  onClick = () => {
+    this.setState({active: !this.state.active});
+  }
 
   render(){
-    // const seq = this.props.model.seq;
-    // const source = this.props.model.source;
-    // const timestamp = this.props.model.timestamp;
-    // const actor = this.props.model.actor;
-    // const id = this.props.model.id;
-    // const name = this.props.model.name;
-    const icon = this.props.model.icon;
-    const category = this.props.model.category;
-    // const recastTime = this.props.model.recastTime;
+    const title = this.props.title;
+    const duration = this.props.duration;
+    const activated = this.state.active?`inline`:`none`;
 
-    // category= 1:aa 2:magic 3:ws 4:abi
     return(
-      <li className={(category===4)?"ability":"gcd"}><img src={images[icon]} /></li>
+      <div className="container">
+        <ul className="title" onClick={this.onClick}>
+          <li>{title}</li>
+          <li>{duration}</li>
+          <li style={{float: `right`}}>icon</li>
+        </ul>
+        <ul className="context" style={{display: activated}}>
+          {this.state.actions}
+        </ul>
+      </div>
     )
   }
 }
 
-// class KagamiCanvas extends React.Component{
-//   shouldComponentUpdate(nextProps){
-//     if(this.props.model.time !== nextProps.model.time) return true;
-//     return false;
-//   }
 
-//   render(){
-//     const actionXMLs = this.props.model.actions.map((action) => {
-//       // if(action.category === 1) return;
-//       return (<KagamiAction key={action.timestamp} model={action}/>)
-//     });
-//     return(
-//       <ul>{actionXMLs}</ul>
-//     )
-//   }
-// }
-
-class KagamiNav extends React.Component{
-  render(){
-    const zone = this.props.model.zone;
-    const duration = this.props.model.duration;
-    const encDPS = this.props.model.encDPS;
-
-    return(
-      <ul>
-        <li key={zone}>{zone}</li>
-        <li key={duration}>{duration}</li>
-        <li key={encDPS}>{encDPS}</li>
-        {/* <li className="icon" key="reset"><FontAwesomeIcon icon="redo" /></li>
-        <li className="icon" key="config"><FontAwesomeIcon icon="cog" /></li> */}
-      </ul>
-    )
-  }
-}
-
-let actionList = [];
-let lastSeq = -1;
-let timeWindow = 10;
 
 class App extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      model: TEST_MODEL
+      model: TEST_MODEL,
+      lastTimestamp: -1,
+      window: [],
+      current: [],
+      history: []
     };
-  }
 
+    this.cleanup = this.cleanup.bind(this);
+    this.reset = this.reset.bind(this);
+  }
   displayResizeHandle() {
     document.documentElement.classList.add("resizeHandle");
   }
   hideResizeHandle() {
     document.documentElement.classList.remove("resizeHandle");
   }
+  /* ========================== */
+  cleanup(){
+    console.log("cleanup");
+    this.setState({
+      model: TEST_MODEL,
+      lastTimestamp: -1,
+      current: [],
+      history: []
+    });
+  }
+  reset(){
+    if(this.state.lastTimestamp !== -1){
+      console.log("reset");
+      let newHistoryArray = this.state.history;
+      const savedCurrentArray = this.state.current;
+      newHistoryArray.unshift({
+        "title": this.state.model.zone, 
+        "duration": this.state.model.duration, 
+        "actions": savedCurrentArray.slice()
+      });
+      this.setState({
+        lastTimestamp: -1,
+        current: [],
+        history: newHistoryArray
+      });
+      // containerArray.unshift({"title":model.zone,"duration":model.duration,"actions":currentActions.slice()});
+      // currentActions = [];
+      // windowActions = windowActions.filter((action) => (new Date(action.props.model.timestamp) > new Date() - 15000));
+      // lastTimestamp = -1;
+    }
+  }
+  readAction(action, timestamp){
+    if(action.category !== 1){
+      // let translate=(timestamp - new Date(this.state.model.time))/1000;
+      // windowActions.push(<KagamiAction key={action.timestamp} model={action}/>);
+      // currentActions.push(<KagamiAction key={action.timestamp} model={action}/>);
+      let newWindowArray = this.state.window;
+      newWindowArray.push(
+        <li key={action.timestamp} className={(action.category===4)?"ability":"gcd"}>
+          <img src={images[action.icon]} alt={action.name} />
+        </li>
+      )
+      let newCurrentArray = this.state.current;
+      newCurrentArray.push(
+        <li key={action.timestamp} className={(action.category===4)?"ability":"gcd"}>
+          <img src={images[action.icon]} alt={action.name} />
+        </li>
+      );
+      this.setState({
+        lastTimestamp: timestamp,
+        window: newWindowArray,
+        current: newCurrentArray
+      });
+    }
+  }
+
+  update(json){
+    if(json.job !== this.state.model.job
+      && 1){
+        this.reset();
+    }
+    if(json.actions.length > 0
+      && 1){
+        if(this.state.lastTimestamp === -1){ // first model; read only last one action.
+          this.readAction(json.actions[0], new Date(json.actions[0].timestamp));
+        }
+        else{ // continue reading all action
+          json.actions.some((action) => {
+            const timestamp = new Date(action.timestamp);
+            if(timestamp > this.state.lastTimestamp){
+              this.readAction(action, timestamp);
+              return false;
+            } 
+            else {return true;} // ignore after duplicated action.
+          });
+        }
+    }
+    else{ 
+      this.reset();
+    }
+    this.setState({model: json});
+  }
+
+  /* =========================== */
   componentDidMount(){
     document.addEventListener('onOverlayDataUpdate', ((e) => {
       this.update(e.detail);
@@ -114,56 +177,41 @@ class App extends React.Component{
       }
     }));
   }
-
-  update(json){
-    const newActionList = json.actions.slice();
-    json.actions = undefined;
-    if(newActionList.length > 0){
-      if(lastSeq === -1) {
-        // newActionList.some((action) => {
-        //   if(action.category === 1) return false;
-        //   actionList.push(action);
-        // })
-        if(newActionList[0].category !== 1) {
-          // actionList.unshift(newActionList[0]);
-          actionList.push(<KagamiAction key={newActionList[0].timestamp} model={newActionList[0]}/>);
-        }
-        lastSeq = newActionList[0].timestamp;
-      }
-      else{
-        newActionList.some((action) => {
-          if(action.timestamp <= lastSeq){
-            const lastTime = Date.parse(json.time) - timeWindow*1000;
-            let i=actionList.length-1;
-            while(lastTime>Date.parse(actionList[i].props.model.timestamp)){
-              actionList.shift();
-              i--;
-            }
-            return true;
-          }
-          if(action.category === 1) return true;
-          // actionList.push(action);
-          actionList.push(<KagamiAction key={action.timestamp} model={action}/>);
-          lastSeq = action.timestamp;
-        });
-      }
-    }
-    else{
-      actionList = [];
-      lastSeq = -1;
-    }
-    this.setState({model: json});
-  }
-
   render(){
+    let history = this.state.history;
+    history = history.map((container) => {
+      return(<KagamiContainer title={container.title} duration={container.duration} actions={container.actions} />)
+    });
     return (
-      <div className="KagamiApp">
-        <nav className="KagamiNav">
-          <KagamiNav model={this.state.model} />
-        </nav>
-        <div className="KagamiAction">
-          {/* <KagamiCanvas key={this.state.model.time} model={this.state.model} /> */}
-          <ul>{actionList}</ul>
+      <div>
+        <div className="top">
+          <nav className="KagamiNav">
+            <ul>
+              <li key={this.state.model.job}><img src={images[this.state.model.job+".png"]} alt={this.state.model.job} /></li> {/* job icon */}
+              <li key={this.state.model.encDPS}>{this.state.model.encDPS}</li> {/* encDPS */}
+              <li key={this.state.model.duration}>{this.state.model.duration}</li> {/* duration */}
+              <li key="reset" onClick={this.reset}>reset</li> {/* reset svg button */}
+              <li key="cleanup" onClick={this.cleanup}>cleanup</li> {/* cleanup svg button */}
+              <li key="config">config</li> {/* config svg button */}
+              <li style={{float: `right`}} key={this.state.model.zone}>{this.state.model.zone}</li> {/* zone */}
+            </ul>
+          </nav>
+          <div className="KagamiWindow">
+            <ul>
+              {this.state.window}
+            </ul>
+          </div>
+        </div>
+        <div className="KagamiContainer">
+          <div className="current">
+            <KagamiContainer key={history.length} title="Current Rotation" duration="" actions={this.state.current}/>
+          </div>
+          <div className="history">
+            {history}
+          </div>
+          <div className="releaseNote">
+            <KagamiContainer title="release note" duration="" actions={RELEASE_NOTE} />
+          </div>
         </div>
       </div>
     );
