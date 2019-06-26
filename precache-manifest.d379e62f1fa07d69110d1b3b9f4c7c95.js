@@ -1,18 +1,18 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "09c8c513b412fd98eb64712a182a08d2",
+    "revision": "918d7797f983cc8403340a3ca81c0e6b",
     "url": "/kagamireact/index.html"
   },
   {
-    "revision": "bb0372f809d6a7a5a0f8",
-    "url": "/kagamireact/static/css/main.eaf11e56.chunk.css"
+    "revision": "b6dccd1ac815bf6ec149",
+    "url": "/kagamireact/static/css/main.b4e273ec.chunk.css"
   },
   {
     "revision": "e185fd3e83ce9a1b599f",
     "url": "/kagamireact/static/js/2.2cf33cb7.chunk.js"
   },
   {
-    "revision": "bb0372f809d6a7a5a0f8",
+    "revision": "b6dccd1ac815bf6ec149",
     "url": "/kagamireact/static/js/main.5fe46f6c.chunk.js"
   },
   {
