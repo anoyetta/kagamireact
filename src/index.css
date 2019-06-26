@@ -9,25 +9,28 @@
   color: #eaf4fc;
   text-shadow: -1px 0 3px #0f2350, 0 1px 3px #0f2350, 1px 0 3px #0f2350, 0 -1px 3px #0f2350;
   font-weight: 300;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 html {
   margin: 0;
-  height: 100%;
+  height: 100vh;
   overflow: hidden;
   background-color: rgba(127, 127, 127, 0.3);
 }
 
 body, #root {
+  display: flex;
+  flex-direction: column;
   margin: 0px;
-  height: 100%;
+  height: 100vh;
 }
 
 .resizeHandle {
   /* background-image: url(../handle.png); */
   background-position: bottom right;
   background-repeat: no-repeat;
-  box-sizing: border-box;
 }
 
 /* body {

@@ -1,5 +1,11 @@
 import React from 'react';
 import './App.css';
+import resetIcon from './svg/ViewRefresh.svg';
+import cleanupIcon from './svg/TrashCan.svg';
+import historyIcon from './svg/MarketLimit.svg';
+import arrowRightIcon from './svg/RoundArrowRight.svg';
+import arrowUpIcon from './svg/NaviUp.svg';
+import arrowDownIcon from './svg/NaviBottom.svg';
 function importAll(r) {
   let images = {};
   r.keys().map((item) => { images[item.replace('./', '')] = r(item); });
@@ -26,13 +32,26 @@ const TEST_MODEL = {
   "isActive": false,
   "actions": []
 }
+var animSpeed = 10;
+
+class KagamiAction extends React.Component{
+  render(){
+    const animationStyle = {
+      animation: `icon-move `+animSpeed+`s linear`
+    };
+    return(
+      <li style={animationStyle} className={(this.props.action.category===4)?"ability":"gcd"}>
+        <img src={images[this.props.action.icon]} alt={this.props.action.name} />
+      </li>
+    )
+  }
+}
 
 class KagamiContainer extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      active: false,
-      actions: this.props.actions
+      active: false
     }
   }
   onClick = () => {
@@ -40,19 +59,20 @@ class KagamiContainer extends React.Component{
   }
 
   render(){
-    const title = this.props.title;
-    const duration = this.props.duration;
     const activated = this.state.active?`inline`:`none`;
+    const icon = this.state.active?<img src={arrowUpIcon}></img>:<img src={arrowDownIcon}></img>;
 
     return(
       <div className="container">
         <ul className="title" onClick={this.onClick}>
-          <li>{title}</li>
-          <li>{duration}</li>
-          <li style={{float: `right`}}>icon</li>
+          <li><img src={historyIcon} alt=""></img></li>
+          <li>{this.props.title}</li>
+          <li>{this.props.duration}</li>
+          <li style={{float: `right`, marginRight: `1em`}}>{icon}</li>
         </ul>
         <ul className="context" style={{display: activated}}>
-          {this.state.actions}
+          <img style={{height: `2rem`}} src={arrowRightIcon}></img>
+          {this.props.actions}
         </ul>
       </div>
     )
@@ -81,6 +101,7 @@ class App extends React.Component{
   hideResizeHandle() {
     document.documentElement.classList.remove("resizeHandle");
   }
+  
   /* ========================== */
   cleanup(){
     console.log("cleanup");
@@ -106,29 +127,14 @@ class App extends React.Component{
         current: [],
         history: newHistoryArray
       });
-      // containerArray.unshift({"title":model.zone,"duration":model.duration,"actions":currentActions.slice()});
-      // currentActions = [];
-      // windowActions = windowActions.filter((action) => (new Date(action.props.model.timestamp) > new Date() - 15000));
-      // lastTimestamp = -1;
     }
   }
   readAction(action, timestamp){
     if(action.category !== 1){
-      // let translate=(timestamp - new Date(this.state.model.time))/1000;
-      // windowActions.push(<KagamiAction key={action.timestamp} model={action}/>);
-      // currentActions.push(<KagamiAction key={action.timestamp} model={action}/>);
       let newWindowArray = this.state.window;
-      newWindowArray.push(
-        <li key={action.timestamp} className={(action.category===4)?"ability":"gcd"}>
-          <img src={images[action.icon]} alt={action.name} />
-        </li>
-      )
+      newWindowArray.push(<KagamiAction key={action.timestamp} action={action} />)
       let newCurrentArray = this.state.current;
-      newCurrentArray.push(
-        <li key={action.timestamp} className={(action.category===4)?"ability":"gcd"}>
-          <img src={images[action.icon]} alt={action.name} />
-        </li>
-      );
+      newCurrentArray.push(<KagamiAction key={action.timestamp} action={action} />);
       this.setState({
         lastTimestamp: timestamp,
         window: newWindowArray,
@@ -183,17 +189,17 @@ class App extends React.Component{
       return(<KagamiContainer title={container.title} duration={container.duration} actions={container.actions} />)
     });
     return (
-      <div>
+      <div id="root">
         <div className="top">
           <nav className="KagamiNav">
             <ul>
               <li key={this.state.model.job}><img src={images[this.state.model.job+".png"]} alt={this.state.model.job} /></li> {/* job icon */}
               <li key={this.state.model.encDPS}>{this.state.model.encDPS}</li> {/* encDPS */}
               <li key={this.state.model.duration}>{this.state.model.duration}</li> {/* duration */}
-              <li key="reset" onClick={this.reset}>reset</li> {/* reset svg button */}
-              <li key="cleanup" onClick={this.cleanup}>cleanup</li> {/* cleanup svg button */}
-              <li key="config">config</li> {/* config svg button */}
-              <li style={{float: `right`}} key={this.state.model.zone}>{this.state.model.zone}</li> {/* zone */}
+              <li key="reset" onClick={this.reset}><img src={resetIcon} alt="reset"></img></li> {/* reset svg button */}
+              <li key="cleanup" onClick={this.cleanup}><img src={cleanupIcon} alt="cleanup"></img></li> {/* cleanup svg button */}
+              {/* <li key="config">config</li> config svg button */}
+              <li key={this.state.model.zone}>{this.state.model.zone}</li> {/* zone */}
             </ul>
           </nav>
           <div className="KagamiWindow">

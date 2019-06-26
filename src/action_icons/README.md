@@ -1,0 +1,1 @@
+All icons are property of SQUARE-ENIX Ltd 1 second ago all rights reserved
