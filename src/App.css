@@ -101,7 +101,7 @@ ul{
   display: none;
 }
 
-.KagamiWindow img, .current img{
+.KagamiWindow img{
   animation: icon-pulse 1s linear;
 }
 
