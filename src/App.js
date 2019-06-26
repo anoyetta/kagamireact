@@ -60,7 +60,7 @@ class KagamiContainer extends React.Component{
 
   render(){
     const activated = this.state.active?`inline`:`none`;
-    const icon = this.state.active?<img src={arrowUpIcon}></img>:<img src={arrowDownIcon}></img>;
+    const icon = this.state.active?<img src={arrowUpIcon} alt=""></img>:<img src={arrowDownIcon} alt=""></img>;
 
     return(
       <div className="container">
@@ -71,7 +71,7 @@ class KagamiContainer extends React.Component{
           <li style={{float: `right`, marginRight: `1em`}}>{icon}</li>
         </ul>
         <ul className="context" style={{display: activated}}>
-          <img style={{height: `2rem`}} src={arrowRightIcon}></img>
+          <img style={{height: `2rem`}} src={arrowRightIcon} alt=">"></img>
           {this.props.actions}
         </ul>
       </div>
@@ -101,7 +101,7 @@ class App extends React.Component{
   hideResizeHandle() {
     document.documentElement.classList.remove("resizeHandle");
   }
-  
+
   /* ========================== */
   cleanup(){
     console.log("cleanup");
