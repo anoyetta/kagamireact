@@ -102,7 +102,6 @@ class App extends React.Component{
 
   /* ========================== */
   cleanup(){
-    console.log("cleanup");
     this.setState({
       model: TEST_MODEL,
       lastTimestamp: -1,
@@ -113,7 +112,6 @@ class App extends React.Component{
   }
   reset(){
     if(this.state.lastTimestamp !== -1){
-      console.log("reset");
       let newHistoryArray = this.state.history;
       const savedCurrentArray = this.state.current;
       newHistoryArray.unshift({
@@ -144,11 +142,10 @@ class App extends React.Component{
 
   update(json){
     if(json.job !== this.state.model.job
-      && 1){
+      && json.isActive !== this.state.model.isActive){
         this.reset();
     }
-    if(json.actions.length > 0
-      && 1){
+    if(json.actions.length > 0){
         if(this.state.lastTimestamp === -1){ // first model; read only last one action.
           this.readAction(json.actions[0], new Date(json.actions[0].timestamp));
         }
