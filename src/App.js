@@ -11,9 +11,15 @@ function importAll(r) {
   r.keys().map((item) => { images[item.replace('./', '')] = r(item); });
   return images;
 }
-const images = importAll(require.context('./action_icons', false, /\.png$/));
+const action_icons = importAll(require.context('./action_icons', false, /\.png$/));
+const job_icons = importAll(require.context('./job_icons', false, /\.png$/));
 const RELEASE_NOTE= [
-  <li>version alpha
+  <li>version 0.5
+    <ul>
+      <li>- V5.0 対応</li>
+    </ul>
+  </li>,
+  <li>version 0.1
     <ul>
       <li>- まれにアクションが取れない?</li>
       <li>- CPU,memory使用量が多すぎ</li>
@@ -23,12 +29,13 @@ const RELEASE_NOTE= [
   </li>
 ];
 const TEST_MODEL = {
-  "player": "",
+  "player": "Ram Ram",
   "job": "BLU",
+  "encounter": null,
   "encDPS": 0.0,
   "duration": "00:00:00",
   "zone": "kagami",
-  "time": "2019-05-23 00:00:00.000",
+  "time": "2019-05-23 17:00:00.000",
   "isActive": false,
   "actions": []
 }
@@ -39,7 +46,7 @@ class KagamiAction extends React.Component{
     const animationStyle = this.props.anim?`icon-move `+animSpeed+`s linear`:``;
     return(
       <li style={{animation: animationStyle}} className={(this.props.action.category===4)?"ability":"gcd"}>
-        <img src={images[this.props.action.icon]} alt={this.props.action.name} />
+        <img src={action_icons[this.props.action.icon]} alt={this.props.action.name} />
       </li>
     )
   }
@@ -142,7 +149,7 @@ class App extends React.Component{
 
   update(json){
     if(json.job !== this.state.model.job
-      && json.isActive !== this.state.model.isActive){
+      /* && json.isActive !== this.state.model.isActive */){
         this.reset();
     }
     if(json.actions.length > 0){
@@ -168,7 +175,7 @@ class App extends React.Component{
 
   /* =========================== */
   componentDidMount(){
-    document.addEventListener('onOverlayDataUpdate', ((e) => {
+    document.addEventListener('onActionUpdated', ((e) => {
       this.update(e.detail);
     }));
     document.addEventListener("onOverlayStateUpdate", ((e) => {
@@ -189,7 +196,7 @@ class App extends React.Component{
         <div className="top">
           <nav className="KagamiNav">
             <ul>
-              <li key={this.state.model.job}><img src={images[this.state.model.job+".png"]} alt={this.state.model.job} /></li> {/* job icon */}
+              <li key={this.state.model.job}><img src={job_icons[this.state.model.job+".png"]} alt={this.state.model.job} /></li> {/* job icon */}
               <li key={this.state.model.encDPS}>{this.state.model.encDPS}</li> {/* encDPS */}
               <li key={this.state.model.duration}>{this.state.model.duration}</li> {/* duration */}
               <li key="reset" onClick={this.reset}><img src={resetIcon} alt="reset"></img></li> {/* reset svg button */}
