@@ -116,8 +116,7 @@ class App extends React.Component{
       && this.state.current.length > 0){
         this.save();
         this.setState({
-          current: [],
-          lastSeq: -1
+          current: []
         });
     }
     // OVERLAY_PLUGIN_API.endEncounter();
@@ -131,31 +130,37 @@ class App extends React.Component{
   //     history: newHistoryArray
   //   })
   // }
-  readAction(action){
-    let newWindowArray = this.state.window;
-    newWindowArray.push(<KagamiAction key={"w"+action.seq} anim={true} action={action} />)
-    let newCurrentArray = this.state.current;
-    newCurrentArray.push(<KagamiAction key={action.seq} anim={false} action={action} />);
-    this.setState({
-      lastSeq: action.seq,
-      window: newWindowArray,
-      current: newCurrentArray
-    });
+  readActions(actions){
+    actions.some((action) => {
+      let newWindowArray = this.state.window;
+      newWindowArray.push(<KagamiAction key={"w"+action.seq} anim={true} action={action} />)
+      let newCurrentArray = this.state.current;
+      newCurrentArray.push(<KagamiAction key={action.seq} anim={false} action={action} />);
+      this.setState({
+        window: newWindowArray,
+        current: newCurrentArray
+      });
+    })
   }
 
   update(json){
     if(json.time !== this.state.model.time){
       let modelSeq = this.state.lastSeq;
+      let pushingActions = [];
       if(json.actions.length > 0){
-        json.actions.some((action) => {
-          if(action.category !== 1){ // is not AA; is action.
-            if(action.seq > modelSeq){
-              this.readAction(action);
-              if(modelSeq === -1) return true; // first model should read only one action.
+        if(modelSeq !== -1){
+          json.actions.some((action) => {
+            if(action.category !== 1){ // is not AA; is action.
+              if(action.seq > modelSeq){
+                pushingActions.unshift(action);
+              }
+              else return true; // ignore after duplication
             }
-            else return true; // ignore after duplication
-          }
-        });
+          });
+          this.readActions(pushingActions);
+        }
+        else if(json.actions[0].category !== 1) this.readActions([json.actions[0]]);
+        this.setState({lastSeq: json.actions[0].seq});
       }
       this.setState({model: json});
     }
