@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/kagamireact/precache-manifest.c8eeba96b60d2467e49825da99e4cb72.js"
+  "/kagamireact/precache-manifest.6ae7d04b40e7dfc2bd9563844f5bcfb5.js"
 );
 
 self.addEventListener('message', (event) => {
