@@ -8,7 +8,7 @@ kagami overlay for kagami plugin.
 
 // 사진
 
-1. Setup [kagami plugin]()
+1. Setup [kagami plugin](https://github.com/anoyetta-academy/kagami/releases)
 2. set URL `https://ramram1048.github.io/kagamireact/`
 
 
