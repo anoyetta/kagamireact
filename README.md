@@ -61,7 +61,7 @@ We will not cover the installation about ***ACT*** or ***OverlayPlugin***.
 
 #### Overlay URLs
 
-> 1. `https://ramram1048.github.io/kagamireact/`
+> `https://ramram1048.github.io/kagamireact/`
 
 
 
